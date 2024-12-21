@@ -94,9 +94,180 @@ h2 {
 }
 
 .search-results {
-  padding: 0 15px;
+  padding: 12px;
   height: calc(100vh - 180px);
   overflow-y: auto;
+  background: #fff;
+  margin: 8px;
+}
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.result-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px;
+  background: #fff;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  position: relative;
+}
+
+.result-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.thumbnail-container {
+  position: relative;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.result-thumbnail {
+  position: relative;
+  width: 140px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-right: 12px;
+  flex-shrink: 0;
+  background: #f0f0f0;
+}
+
+.result-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.result-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.result-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #0f0f0f;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.result-metadata {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.channel-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.channel-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #eee;
+  overflow: hidden;
+}
+
+.channel-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.result-details {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #606060;
+  font-size: 12px;
+}
+
+.result-details > span {
+  display: flex;
+  align-items: center;
+}
+
+.result-details > span:not(:last-child)::after {
+  content: "•";
+  margin: 0 4px;
+  color: #606060;
+}
+
+.channel-name {
+  font-size: 12px;
+  color: #606060;
+  margin: 0;
+}
+
+.views-count {
+  font-size: 12px;
+  color: #606060;
+}
+
+.publish-time {
+  font-size: 12px;
+  color: #606060;
+}
+
+.duration-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.more-options {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  background: transparent;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: #606060;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.more-options:hover {
+  background-color: #f0f0f0;
+}
+
+.result-description {
+  font-size: 13px;
+  color: #606060;
+  margin: 8px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .empty-search {
@@ -137,80 +308,4 @@ h2 {
 .suggestion-item span:last-child {
   font-size: 14px;
   color: #333;
-}
-
-.results-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.result-item {
-  display: flex;
-  align-items: flex-start;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-  cursor: pointer;
-  position: relative;
-}
-
-.thumbnail-container {
-  position: relative;
-  margin-right: 12px;
-  flex-shrink: 0;
-}
-
-.result-thumbnail {
-  width: 160px;
-  height: 90px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.duration {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 1px 4px;
-  border-radius: 2px;
-  font-size: 12px;
-}
-
-.result-info {
-  flex: 1;
-  min-width: 0;
-  padding-right: 24px;
-}
-
-.result-title {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 500;
-  color: #000;
-  line-height: 1.2;
-  margin-bottom: 4px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.result-channel {
-  margin: 0;
-  font-size: 14px;
-  color: #606060;
-}
-
-.more-options {
-  position: absolute;
-  right: 0;
-  top: 10px;
-  background: none;
-  border: none;
-  color: #606060;
-  font-size: 20px;
-  padding: 8px;
-  cursor: pointer;
 }
