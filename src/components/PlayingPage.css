@@ -73,7 +73,6 @@
 .track-info {
   padding: 16px;
   background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, #000000 100%);
-  margin-top: -60px;
   position: relative;
   z-index: 1;
 }
@@ -102,35 +101,36 @@
 .progress-container {
   width: 90%;
   margin: auto 0;
-  /* makes it in the center */
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  z-index: 2;
 }
 
 .progress-bar {
   width: 100%;
-  height: 2px;
+  height: 4px;
   background: rgba(255, 255, 255, 0.2);
   cursor: pointer;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
   position: relative;
+  border-radius: 2px;
 }
 
-.progress-bar:before {
-  content: '';
-  position: absolute;
-  top: -8px;
-  left: 0;
-  right: 0;
-  bottom: -8px;
+.progress-bar:hover {
+  height: 6px;
+}
+
+.progress-bar:hover .progress {
+  background: #1db954;
 }
 
 .progress {
   height: 100%;
   background: white;
-  transition: width 0.1s linear;
+  transition: width 0.1s linear, background-color 0.2s;
+  border-radius: 2px;
 }
 
 .time-display {

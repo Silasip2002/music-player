@@ -3,16 +3,19 @@ import './SearchPage.css';
 
 const SearchPage = ({ searchResults, onTrackSelect }) => {
   const formatDuration = (duration) => {
-    if (!duration) return "0:00"; // Default duration
-    const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-    const hours = (match[1] || '').replace('H', '');
-    const minutes = (match[2] || '').replace('M', '');
-    const seconds = (match[3] || '').replace('S', '');
+    if (!duration || typeof duration !== 'string') return "0:00";
     
-    let result = '';
-    if (hours) result += `${hours}:`;
-    result += `${minutes || '0'}:${seconds.padStart(2, '0')}`;
-    return result;
+    const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+    if (!match) return "0:00";
+
+    const hours = parseInt(match[1] || '0');
+    const minutes = parseInt(match[2] || '0');
+    const seconds = parseInt(match[3] || '0');
+    
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
   const formatTimeAgo = (publishedAt) => {
