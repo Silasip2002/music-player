@@ -3,7 +3,7 @@ import './SearchPage.css';
 
 const SearchPage = ({ searchResults, onTrackSelect }) => {
   const formatDuration = (duration) => {
-    if (!duration) return "3:25"; // Default duration
+    if (!duration) return "0:00"; // Default duration
     const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
     const hours = (match[1] || '').replace('H', '');
     const minutes = (match[2] || '').replace('M', '');
@@ -77,7 +77,7 @@ const SearchPage = ({ searchResults, onTrackSelect }) => {
                   alt={result.snippet.title}
                 />
                 <span className="duration-badge">
-                  {formatDuration(result.contentDetails?.duration) || "3:25"}
+                  {formatDuration(result.contentDetails?.duration) || "0:00"}
                 </span>
               </div>
               <div className="result-info">
