@@ -1,83 +1,115 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './PlayingPage.css';
 
-function PlayingPage({ onClose, track }) {
-  const [isPlaying, setIsPlaying] = useState(false);
+const PlayingPage = ({ track, onClose }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isRepeat, setIsRepeat] = useState(false);
   const [isShuffle, setIsShuffle] = useState(false);
-  const [isRepeat, setIsRepeat] = useState(true);
+  
   const playerRef = useRef(null);
   const timeTrackingRef = useRef(null);
+  const playerContainerRef = useRef(null);
 
   useEffect(() => {
+    // Reset states
+    setCurrentTime(0);
+    setDuration(0);
+    setIsPlaying(false);
+    stopTimeTracking();
+
+    // Cleanup old player
+    if (playerRef.current) {
+      try {
+        playerRef.current.destroy();
+      } catch (error) {
+        console.error('Error cleaning up player:', error);
+      }
+      playerRef.current = null;
+    }
+
+    // Clear the container
+    if (playerContainerRef.current) {
+      playerContainerRef.current.innerHTML = '';
+    }
+
+    // Create new container
+    const playerContainer = document.createElement('div');
+    playerContainer.id = 'youtube-player';
+    if (playerContainerRef.current) {
+      playerContainerRef.current.appendChild(playerContainer);
+    }
+
+    const loadPlayer = () => {
+      if (!track?.videoId) return;
+      
+      try {
+        const player = new window.YT.Player('youtube-player', {
+          height: '0',
+          width: '0',
+          videoId: track.videoId,
+          playerVars: {
+            playsinline: 1,
+            controls: 0,
+            disablekb: 1,
+            rel: 0,
+            autoplay: 1
+          },
+          events: {
+            onReady: onPlayerReady,
+            onStateChange: onPlayerStateChange,
+          },
+        });
+        playerRef.current = player;
+      } catch (error) {
+        console.error('Error creating player:', error);
+      }
+    };
+
     if (!window.YT) {
       const tag = document.createElement('script');
       tag.src = 'https://www.youtube.com/iframe_api';
       const firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-      window.onYouTubeIframeAPIReady = initPlayer;
+      window.onYouTubeIframeAPIReady = loadPlayer;
     } else {
-      initPlayer();
+      loadPlayer();
     }
 
     return () => {
       stopTimeTracking();
       if (playerRef.current) {
         try {
-          // Stop video and remove event listeners
-          playerRef.current.stopVideo && playerRef.current.stopVideo();
-          playerRef.current = null;
+          playerRef.current.destroy();
         } catch (error) {
-          console.error('Error cleaning up player:', error);
+          console.error('Error destroying player:', error);
         }
+        playerRef.current = null;
       }
     };
-  }, []);
-
-  const initPlayer = () => {
-    try {
-      // Create a new player instance
-      const player = new window.YT.Player('youtube-player', {
-        height: '0',
-        width: '0',
-        videoId: track?.videoId || 'M7lc1UVf-VE',
-        playerVars: {
-          playsinline: 1,
-          controls: 0,
-          disablekb: 1,
-          rel: 0,
-          autoplay: 1,
-          loop: isRepeat ? 1 : 0
-        },
-        events: {
-          onReady: onPlayerReady,
-          onStateChange: onPlayerStateChange,
-        },
-      });
-
-      // Store the player instance
-      playerRef.current = player;
-    } catch (error) {
-      console.error('Error initializing player:', error);
-    }
-  };
+  }, [track?.videoId]);
 
   const startTimeTracking = () => {
     stopTimeTracking();
-    timeTrackingRef.current = setInterval(() => {
-      if (playerRef.current?.getCurrentTime && playerRef.current?.getDuration) {
-        try {
-          const currentTime = playerRef.current.getCurrentTime();
-          const duration = playerRef.current.getDuration();
-          setCurrentTime(currentTime);
-          setDuration(duration);
-        } catch (error) {
-          console.error('Error updating time:', error);
-        }
+    updateTimeAndDuration();
+    timeTrackingRef.current = setInterval(updateTimeAndDuration, 50);
+  };
+
+  const updateTimeAndDuration = () => {
+    if (!playerRef.current?.getCurrentTime || !playerRef.current?.getDuration) return;
+    
+    try {
+      const currentTime = playerRef.current.getCurrentTime();
+      const duration = playerRef.current.getDuration();
+      
+      if (currentTime && duration) {
+        setCurrentTime(currentTime);
+        setDuration(duration);
       }
-    }, 100);
+    } catch (error) {
+      console.error('Error updating time:', error);
+    }
   };
 
   const stopTimeTracking = () => {
@@ -90,7 +122,6 @@ function PlayingPage({ onClose, track }) {
   const onPlayerReady = (event) => {
     try {
       const player = event.target;
-      playerRef.current = player;
       const duration = player.getDuration();
       setDuration(duration);
       player.playVideo();
@@ -124,18 +155,22 @@ function PlayingPage({ onClose, track }) {
     }
   };
 
-  const handleSeek = (e) => {
+  const handleProgressBarClick = (e) => {
     if (!playerRef.current || !duration) return;
     
     const progressBar = e.currentTarget;
     const rect = progressBar.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const width = rect.width;
-    const percentage = x / width;
-    const seekTime = percentage * duration;
+    const clickPosition = e.clientX - rect.left;
+    const progressBarWidth = rect.width;
+    const percentage = clickPosition / progressBarWidth;
+    const newTime = percentage * duration;
     
-    playerRef.current.seekTo(seekTime);
-    setCurrentTime(seekTime);
+    try {
+      playerRef.current.seekTo(newTime, true);
+      setCurrentTime(newTime);
+    } catch (error) {
+      console.error('Error seeking:', error);
+    }
   };
 
   const formatTime = (time) => {
@@ -203,10 +238,13 @@ function PlayingPage({ onClose, track }) {
         </div>
 
         <div className="progress-container">
-          <div className="progress-bar" onClick={handleSeek}>
+          <div className="progress-bar" onClick={handleProgressBarClick}>
             <div 
               className="progress" 
-              style={{ width: `${(currentTime / duration) * 100}%` }}
+              style={{ 
+                width: `${duration ? (currentTime / duration) * 100 : 0}%`,
+                transition: 'width 0.1s linear'
+              }}
             ></div>
           </div>
           <div className="time-display">
@@ -255,9 +293,7 @@ function PlayingPage({ onClose, track }) {
         </div>
       </div>
 
-      <div id="youtube-player" style={{ display: 'none' }}>
-        <div ref={playerRef}></div>
-      </div>
+      <div ref={playerContainerRef} style={{ display: 'none' }}></div>
     </div>
   );
 };
